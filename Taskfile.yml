@@ -5,7 +5,7 @@ tasks:
   build:
     cmds:
       # compile main
-      - clang++ -std=c++11 -stdlib=libc++ -I./glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp -o main
+      - clang++ -std=c++11 -stdlib=libc++ -I./glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./glad/src/glad.c -o main
 
   build:example:
     cmds:
