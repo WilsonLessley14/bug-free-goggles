@@ -2,7 +2,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+// resizing window callback function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+// processing inputs
+void processInput(GLFWwindow *window);
 
 int main(int argc, char** argv) {
   //instantiate the glfw window
@@ -50,6 +54,8 @@ int main(int argc, char** argv) {
 
   // render loop initiated
   while(!glfwWindowShouldClose(window)) {
+    processInput(window);
+
     // swaps the color buffer (large 2D buffer that contains color values for each pixel in the window)
     // shows this buffer as output
     // double buffering is a common method that avoids flickering when screens are drawn
@@ -71,4 +77,9 @@ int main(int argc, char** argv) {
 // does glfwSetFramebufferSizeCallback always invoke the callback with width and height? what else can it invoke with? do all callbacks get invoked the same way?
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
 }
