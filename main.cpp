@@ -52,6 +52,79 @@ int main(int argc, char** argv) {
 
   // note: callback functions must be registered after the window is created, but before the render loop is initiated
 
+  // 2d triangle defined with 3d coords
+  float vertices[] = {
+    -0.5f, -0.5f, 0,
+    0.5f, -0.5f, 0,
+    0.0f, 0.5f, 0,
+  };
+
+  // Normalized Device Coordinates (NDC)
+  /*
+    xyz values range from -1.0 to 1.0
+    any coords outside of this range will be discarded/clipped
+    0, 0 is direct center, and raising y moves up, not down (as opposed to typical graphics on computers)
+    NDC coords get transformed into screen-space coordinates via `viewport transform` using data provided to glViewport
+    screen-space coordinates are transformed to fragments as inputs to the fragment shader
+  */
+
+  /*
+    we use vertex buffer objects to store a large number of vertices in GPU's memory
+    we do this so that we can send large batches of data at once
+    GPU takes time to recieve inputs, so the larger the batches the better.
+  */
+
+  // create buffer object
+  unsigned int VBO;
+  // generate/link buffer object within OpenGL context
+  glGenBuffers(1, &VBO);
+  // bind buffer object as the GL_ARRAY_BUFFER
+  // many buffers can be assigned, as long as each has a different buffer type
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  // glBufferData copies arg 3 into arg 1
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  /*
+    GL_STREAM_DRAW: data set once and used by GPU a few times (at most)
+    GL_STATIC_DRAW: data set once and used by GPU many times
+    GL_DYNAMIC_DRAW: data is changed a lot and used many times
+  */
+
+  const char *vertexShaderSource = "#version 300 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main() {\n"
+      "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+  // OpenGL has to compile the shader at run-time from it's own source code
+  unsigned int vertexShader;
+  // store the shader as an unsigned int create the shader
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+  // attach shader source code to the shader object
+  // shader object to compile, number of strings being passed as source code, shader source code, NULL
+  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  // compile the shader
+  glCompileShader(vertexShader);
+
+  // adding a debug statement. we are going to check if glCompileShader is succesful or not.
+  // this is how we check for compile time errors
+
+  // nice, no errors
+
+  // integer that indicates success
+  int success;
+  char infoLog[512];
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+  if (!success) {
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::cout << "bro what? error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+
+
+
   // render loop initiated
   while(!glfwWindowShouldClose(window)) {
 
