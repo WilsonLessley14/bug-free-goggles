@@ -91,22 +91,38 @@ int main(int argc, char** argv) {
     GL_DYNAMIC_DRAW: data is changed a lot and used many times
   */
 
-  const char *vertexShaderSource = "#version 300 core\n"
+  /* -------- Shader Sources -------- */
+
+  const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main() {\n"
       "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
+  const char *fragmentShaderSource = "#version 330 core\n"
+  "out vec4 FragColor;\n"
+  "void main() {\n"
+    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+  "}\n";
+
+  /* -------- End Shader Sources -------- */
+
+  /* -------- Shader Compilation -------- */
+
   // OpenGL has to compile the shader at run-time from it's own source code
-  unsigned int vertexShader;
+  unsigned int vertexShader, fragmentShader;
+
   // store the shader as an unsigned int create the shader
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
   // attach shader source code to the shader object
   // shader object to compile, number of strings being passed as source code, shader source code, NULL
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
   // compile the shader
   glCompileShader(vertexShader);
+  glCompileShader(fragmentShader);
 
   // adding a debug statement. we are going to check if glCompileShader is succesful or not.
   // this is how we check for compile time errors
@@ -116,6 +132,8 @@ int main(int argc, char** argv) {
   // integer that indicates success
   int success;
   char infoLog[512];
+
+  // -- check for vertex shader compilation errors -- //
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 
   if (!success) {
@@ -123,6 +141,15 @@ int main(int argc, char** argv) {
     std::cout << "bro what? error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
+  // -- check for fragment shader compilation errors -- //
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+
+  if (!success) {
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    std::cout << "bro what? error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+
+  /* -------- End Shader Compilation -------- */
 
 
   // render loop initiated
