@@ -149,11 +149,6 @@ int main(int argc, char** argv) {
     GPU takes time to recieve inputs, so the larger the batches the better.
   */
 
-  // declare buffer object
-  unsigned int VBO;
-  // declare vertex array object
-  unsigned int VAO;
-
   // VAO notes
   /*
     Vertex Array Object, or VAO, can be bound just like a VBO.
@@ -165,8 +160,15 @@ int main(int argc, char** argv) {
 
   */
 
-  // generate/link buffer object within OpenGL context
+  // declare buffer and array object
+  unsigned int VBO, VAO;
+
+  // generate/link buffer and array objects within OpenGL context
+  glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
+
+  // bind the array object first
+  glBindVertexArray(VAO);
   // bind buffer object as the GL_ARRAY_BUFFER
   // many buffers can be assigned, as long as each has a different buffer type
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -180,8 +182,6 @@ int main(int argc, char** argv) {
     GL_DYNAMIC_DRAW: data is changed a lot and used many times
   */
 
-
-  // almost there.
   /*
     so far we have:
       sent the input vertex data to the GPU
@@ -249,9 +249,11 @@ int main(int argc, char** argv) {
   // by default vertex attributes are disabled
   glEnableVertexAttribArray(0);
 
-  // there is a lot going on here, and this is just for 1 VBO with 1 (really its 0) attributes
-  // what if we had 5 different attributes and >100 VBO's? that would get cumbersome quickly.
-  // well... take a look at the next section
+  // unbind VBO
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // unbind VAO
+  glBindVertexArray(0);
+
 
   /* -------- End Linking Vertex Attributes -------- */
 
@@ -274,7 +276,6 @@ int main(int argc, char** argv) {
     glUseProgram(shaderProgram);
     // bind VAO
     glBindVertexArray(VAO);
-
     // draw that mfing triangle
     // args: primitive type, starting index of vertex array, how many vertices we want to draw
     glDrawArrays(GL_TRIANGLES, 0, 3);
