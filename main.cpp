@@ -125,9 +125,16 @@ int main(int argc, char** argv) {
 
   // 2d triangle defined with 3d coords
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
+    0.5f, 0.5f, 0.0f, // top right
+    0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f, 0.5f, 0.0f, // top left
+  };
+
+  // EBO - element buffer object
+  unsigned int indices[] = {
+    0, 1, 3, // first triangle
+    1, 2, 3, // second triangle
   };
 
   // Normalized Device Coordinates (NDC)
@@ -152,20 +159,23 @@ int main(int argc, char** argv) {
     good explanations in this forum
   */
 
-  unsigned int VBO, VAO;
+  unsigned int EBO, VBO, VAO;
 
   // generate/link buffer and array objects within OpenGL context
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
 
   // bind the array object first
   glBindVertexArray(VAO);
   // bind buffer object as the GL_ARRAY_BUFFER
-  // many buffers can be assigned, as long as each has a different buffer type
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
   // glBufferData copies arg 3 into arg 1
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // bind element buffer object
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   /*
     GL_STREAM_DRAW: data set once and used by GPU a few times (at most)
@@ -256,8 +266,10 @@ int main(int argc, char** argv) {
     // bind VAO
     glBindVertexArray(VAO);
     // draw that mfing triangle
-    // args: primitive type, starting index of vertex array, how many vertices we want to draw
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // args: primitive type, how many indices to draw, type of indices, starting point of indices
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // unbind VAO
+    glBindVertexArray(0);
 
     // swap buffers and poll IO events (keys pressed/released, mouse moved, etc.)
     glfwPollEvents();
