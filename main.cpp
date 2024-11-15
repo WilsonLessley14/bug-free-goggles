@@ -75,10 +75,9 @@ int main(int argc, char** argv) {
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
   // attach shader source code to the shader object
-  // shader object to compile, number of strings being passed as source code, shader source code, NULL
+  // args; shader object to compile, number of strings being passed as source code, shader source code, NULL
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
   glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  // compile the shader
   glCompileShader(vertexShader);
   glCompileShader(fragmentShader);
 
@@ -100,14 +99,10 @@ int main(int argc, char** argv) {
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
-  /* -------- End Shader Compilation -------- */
-
   /* -------- Shader Program Creation, Attachment, and Linking -------- */
 
   // define the shader program
-  unsigned int shaderProgram;
-  // glCreateProgram creates the program object and returns the ID reference to this object
-  shaderProgram = glCreateProgram();
+  unsigned int shaderProgram = glCreateProgram();
 
   // attach previously compiled shaders to shader program
   glAttachShader(shaderProgram, vertexShader);
@@ -122,6 +117,7 @@ int main(int argc, char** argv) {
     glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
+  // delete shaders once you are done with them
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
@@ -147,20 +143,15 @@ int main(int argc, char** argv) {
     we use vertex buffer objects to store a large number of vertices in GPU's memory
     we do this so that we can send large batches of data at once
     GPU takes time to recieve inputs, so the larger the batches the better.
-  */
 
-  // VAO notes
-  /*
     Vertex Array Object, or VAO, can be bound just like a VBO.
     subsequent vertex attribute calls will be stored inside the VAO.
 
     aside: what is a vertex attribute?
     https://www.reddit.com/r/opengl/comments/91jcnf/what_is_a_vertex_attribute_in_opengl/
     good explanations in this forum
-
   */
 
-  // declare buffer and array object
   unsigned int VBO, VAO;
 
   // generate/link buffer and array objects within OpenGL context
@@ -180,16 +171,6 @@ int main(int argc, char** argv) {
     GL_STREAM_DRAW: data set once and used by GPU a few times (at most)
     GL_STATIC_DRAW: data set once and used by GPU many times
     GL_DYNAMIC_DRAW: data is changed a lot and used many times
-  */
-
-  /*
-    so far we have:
-      sent the input vertex data to the GPU
-        VBO and assigning buffer data
-      instructed the GPU on how it should process vertex data with a vertex and fragment shader
-
-    OpenGL does not yet know how to interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
-    lets do that
   */
 
   /* -------- Linking Vertex Attributes -------- */
@@ -246,7 +227,6 @@ int main(int argc, char** argv) {
   */
 
   // we are giving this function the vertex attribute location, so 0
-  // by default vertex attributes are disabled
   glEnableVertexAttribArray(0);
 
   // unbind VBO
@@ -254,16 +234,15 @@ int main(int argc, char** argv) {
   // unbind VAO
   glBindVertexArray(0);
 
-
   /* -------- End Linking Vertex Attributes -------- */
 
   // render loop initiated
   while(!glfwWindowShouldClose(window)) {
 
-    // input processing phase
+    // --- INPUT --- //
     processInput(window);
 
-    // rendering phase
+    // --- RENDER --- //
 
     // state setting function that specifies a color to "clear" the color buffer with
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -280,18 +259,15 @@ int main(int argc, char** argv) {
     // args: primitive type, starting index of vertex array, how many vertices we want to draw
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // event polling phase
-    // checks for event triggers (keyboard input, mouse movement)
-    // updates winodw state, and calls registered callback functions (when applicable)
+    // swap buffers and poll IO events (keys pressed/released, mouse moved, etc.)
     glfwPollEvents();
-
-    // swaps the color buffer (large 2D buffer that contains color values for each pixel in the window)
-    // shows this buffer as output
-    // double buffering is a common method that avoids flickering when screens are drawn
-    // we actually render to the "back" buffer
-    // once rendering is complete, we swap the "back" buffer with the "front" buffer, so that the completed render is now being displayed
     glfwSwapBuffers(window);
   }
+
+  // de allocate resources
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteProgram(shaderProgram);
 
   // gotta close your shit
   glfwTerminate();
