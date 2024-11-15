@@ -74,8 +74,22 @@ int main(int argc, char** argv) {
     GPU takes time to recieve inputs, so the larger the batches the better.
   */
 
-  // create buffer object
+  // declare buffer object
   unsigned int VBO;
+  // declare vertex array object
+  unsigned int VAO;
+
+  // VAO notes
+  /*
+    Vertex Array Object, or VAO, can be bound just like a VBO.
+    subsequent vertex attribute calls will be stored inside the VAO.
+
+    aside: what is a vertex attribute?
+    https://www.reddit.com/r/opengl/comments/91jcnf/what_is_a_vertex_attribute_in_opengl/
+    good explanations in this forum
+
+  */
+
   // generate/link buffer object within OpenGL context
   glGenBuffers(1, &VBO);
   // bind buffer object as the GL_ARRAY_BUFFER
@@ -172,14 +186,6 @@ int main(int argc, char** argv) {
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
-  // tell OpenGL context to use this shader program
-  glUseProgram(shaderProgram);
-  // every shader and rendering call after this invocation will use this program object
-
-  // we can now delete the shader objects, since they have already been linked to the program
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-
   /* -------- End Shader Program Creation, Attachment, and Linking -------- */
 
   // almost there.
@@ -256,24 +262,6 @@ int main(int argc, char** argv) {
 
   /* -------- End Linking Vertex Attributes -------- */
 
-  /* -------- Vertex Array Object -------- */
-
-  // notes
-  /*
-    Vertex Array Object, or VAO, can be bound just like a VBO.
-    subsequent vertex attribute calls will be stored inside the VAO.
-
-    aside: what is a vertex attribute?
-    https://www.reddit.com/r/opengl/comments/91jcnf/what_is_a_vertex_attribute_in_opengl/
-    good explanations in this forum
-
-
-  */
-
-  /* -------- End Vertex Array Object -------- */
-
-
-
   // render loop initiated
   while(!glfwWindowShouldClose(window)) {
 
@@ -288,6 +276,19 @@ int main(int argc, char** argv) {
     // we also have access to other buffers, like GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT
     // ultimately these two lines result in the window have a green blueish color
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // bind shader program
+    glUseProgram(shaderProgram);
+    // bind VAO
+    glBindVertexArray(VAO);
+
+    // draw that mfing triangle
+    // args: primitive type, starting index of vertex array, how many vertices we want to draw
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    //shader cleanup
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
     // event polling phase
     // checks for event triggers (keyboard input, mouse movement)
