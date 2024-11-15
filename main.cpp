@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "bro what? error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+    std::cout << "error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   // -- check for fragment shader compilation errors -- //
@@ -146,10 +146,34 @@ int main(int argc, char** argv) {
 
   if (!success) {
     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "bro what? error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   /* -------- End Shader Compilation -------- */
+
+  /* -------- Shader Program Creation, Attachment, and Linking -------- */
+
+  // define the shader program
+  unsigned int shaderProgram;
+  // glCreateProgram creates the program object and returns the ID reference to this object
+  shaderProgram = glCreateProgram();
+
+  // attach previously compiled shaders to shader program
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+
+  // link the program (with the shaders attached)
+  glLinkProgram(shaderProgram);
+
+  // -- check for linking errors -- //
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
+    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+
+
+  /* -------- End Shader Program Creation, Attachment, and Linking -------- */
 
 
   // render loop initiated
