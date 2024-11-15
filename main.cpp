@@ -129,9 +129,9 @@ int main(int argc, char** argv) {
 
   // 2d triangle defined with 3d coords
   float vertices[] = {
-    -0.5f, -0.5f, 0,
-    0.5f, -0.5f, 0,
-    0.0f, 0.5f, 0,
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
   };
 
   // Normalized Device Coordinates (NDC)
