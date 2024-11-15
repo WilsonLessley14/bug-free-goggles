@@ -172,8 +172,106 @@ int main(int argc, char** argv) {
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
+  // tell OpenGL context to use this shader program
+  glUseProgram(shaderProgram);
+  // every shader and rendering call after this invocation will use this program object
+
+  // we can now delete the shader objects, since they have already been linked to the program
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
 
   /* -------- End Shader Program Creation, Attachment, and Linking -------- */
+
+  // almost there.
+  /*
+    so far we have:
+      sent the input vertex data to the GPU
+        VBO and assigning buffer data
+      instructed the GPU on how it should process vertex data with a vertex and fragment shader
+
+    OpenGL does not yet know how to interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
+    lets do that
+  */
+
+  /* -------- Linking Vertex Attributes -------- */
+
+  /* notes */
+  /*
+    position data is stored as 4 byte (32 bits) floating point values
+    each position is composed of 3 floats
+    values are tightly packed (no other information stored between each value)
+    first value is at the beginning of the buffer
+  */
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  // lets walk through the above function invocation
+  /*
+    param 1:
+      value: 0
+      specifies which vertex attribute we want to configure.
+      we specified the location of the `position` vertex attribute in the vertex shader with `layout (location=0)`
+      this sets the location of the vertex attribute to 0
+      since we want to pass data to this attribute, we pass in 0
+
+    param 2:
+      value: 3
+      size of the vertex attribute.
+      attribute is defined as vec3, so it's composed of 3 values
+
+    param 3:
+      value: GL_FLOAT
+      specifies type of the data
+
+    param 4:
+      value: GL_FALSE
+      specifies if we want the data to be normalized
+      if we were inputing integer data types, we would set this to be GL_TRUE
+
+    param 5:
+      value: 3 * sizeof(float)
+      refered to as the 'stride'
+      tells us the space between consecutive vertex attributes
+      each vertex is 3 floats, so the stride will be the size of 3 floats
+      we could set this as 0, which lets openGL determine the stride (this only works when values are tightly packed) //try this
+      when we have more vertex attributes, we need to carefully define the spacing between each vertex attribute
+
+    param 6:
+      value: (void*)0
+      this last param is of type `void`, thus the weird cast hereO?>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      this is the offest of where the position data begins in the buffer.
+      this is 0 because our vertex object starts with position data
+
+
+    glEnableVertexAttribArray uses the VBO that is bound to GL_ARRAY_BUFFER
+
+  */
+
+  // we are giving this function the vertex attribute location, so 0
+  // by default vertex attributes are disabled
+  glEnableVertexAttribArray(0);
+
+  // there is a lot going on here, and this is just for 1 VBO with 1 (really its 0) attributes
+  // what if we had 5 different attributes and >100 VBO's? that would get cumbersome quickly.
+  // well... take a look at the next section
+
+  /* -------- End Linking Vertex Attributes -------- */
+
+  /* -------- Vertex Array Object -------- */
+
+  // notes
+  /*
+    Vertex Array Object, or VAO, can be bound just like a VBO.
+    subsequent vertex attribute calls will be stored inside the VAO.
+
+    aside: what is a vertex attribute?
+    https://www.reddit.com/r/opengl/comments/91jcnf/what_is_a_vertex_attribute_in_opengl/
+    good explanations in this forum
+
+
+  */
+
+  /* -------- End Vertex Array Object -------- */
+
 
 
   // render loop initiated
