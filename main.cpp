@@ -8,6 +8,19 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // processing inputs
 void processInput(GLFWwindow *window);
 
+// shader sources
+const char *vertexShaderSource = "#version 330 core\n"
+  "layout (location = 0) in vec3 aPos;\n"
+  "void main() {\n"
+    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+  "}\0";
+
+const char *fragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main() {\n"
+  "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\n";
+
 int main(int argc, char** argv) {
   //instantiate the glfw window
   glfwInit();
@@ -104,22 +117,6 @@ int main(int argc, char** argv) {
     GL_STATIC_DRAW: data set once and used by GPU many times
     GL_DYNAMIC_DRAW: data is changed a lot and used many times
   */
-
-  /* -------- Shader Sources -------- */
-
-  const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main() {\n"
-      "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-  const char *fragmentShaderSource = "#version 330 core\n"
-  "out vec4 FragColor;\n"
-  "void main() {\n"
-    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-  "}\n";
-
-  /* -------- End Shader Sources -------- */
 
   /* -------- Shader Compilation -------- */
 
