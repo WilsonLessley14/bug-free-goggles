@@ -65,6 +65,68 @@ int main(int argc, char** argv) {
 
   // note: callback functions must be registered after the window is created, but before the render loop is initiated
 
+  /* -------- Shader Compilation -------- */
+
+  // OpenGL has to compile the shader at run-time from it's own source code
+  unsigned int vertexShader, fragmentShader;
+
+  // store the shader as an unsigned int create the shader
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+  // attach shader source code to the shader object
+  // shader object to compile, number of strings being passed as source code, shader source code, NULL
+  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  // compile the shader
+  glCompileShader(vertexShader);
+  glCompileShader(fragmentShader);
+
+  // this is how we check for compile time errors
+  int success;
+  char infoLog[512];
+
+  // -- check for vertex shader compilation errors -- //
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::cout << "error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+
+  // -- check for fragment shader compilation errors -- //
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+
+  /* -------- End Shader Compilation -------- */
+
+  /* -------- Shader Program Creation, Attachment, and Linking -------- */
+
+  // define the shader program
+  unsigned int shaderProgram;
+  // glCreateProgram creates the program object and returns the ID reference to this object
+  shaderProgram = glCreateProgram();
+
+  // attach previously compiled shaders to shader program
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+
+  // link the program (with the shaders attached)
+  glLinkProgram(shaderProgram);
+
+  // -- check for linking errors -- //
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
+    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
+  }
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+
+  /* -------- End Shader Program Creation, Attachment, and Linking -------- */
+
   // 2d triangle defined with 3d coords
   float vertices[] = {
     -0.5f, -0.5f, 0,
@@ -118,72 +180,6 @@ int main(int argc, char** argv) {
     GL_DYNAMIC_DRAW: data is changed a lot and used many times
   */
 
-  /* -------- Shader Compilation -------- */
-
-  // OpenGL has to compile the shader at run-time from it's own source code
-  unsigned int vertexShader, fragmentShader;
-
-  // store the shader as an unsigned int create the shader
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-  // attach shader source code to the shader object
-  // shader object to compile, number of strings being passed as source code, shader source code, NULL
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  // compile the shader
-  glCompileShader(vertexShader);
-  glCompileShader(fragmentShader);
-
-  // adding a debug statement. we are going to check if glCompileShader is succesful or not.
-  // this is how we check for compile time errors
-
-  // nice, no errors
-
-  // integer that indicates success
-  int success;
-  char infoLog[512];
-
-  // -- check for vertex shader compilation errors -- //
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "error! vertex shader compilation failed.\nhere is the log: " << infoLog << std::endl;
-  }
-
-  // -- check for fragment shader compilation errors -- //
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
-  }
-
-  /* -------- End Shader Compilation -------- */
-
-  /* -------- Shader Program Creation, Attachment, and Linking -------- */
-
-  // define the shader program
-  unsigned int shaderProgram;
-  // glCreateProgram creates the program object and returns the ID reference to this object
-  shaderProgram = glCreateProgram();
-
-  // attach previously compiled shaders to shader program
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-
-  // link the program (with the shaders attached)
-  glLinkProgram(shaderProgram);
-
-  // -- check for linking errors -- //
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
-    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
-  }
-
-  /* -------- End Shader Program Creation, Attachment, and Linking -------- */
 
   // almost there.
   /*
@@ -282,10 +278,6 @@ int main(int argc, char** argv) {
     // draw that mfing triangle
     // args: primitive type, starting index of vertex array, how many vertices we want to draw
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    //shader cleanup
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
 
     // event polling phase
     // checks for event triggers (keyboard input, mouse movement)
