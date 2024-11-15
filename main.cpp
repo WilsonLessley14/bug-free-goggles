@@ -125,16 +125,19 @@ int main(int argc, char** argv) {
 
   // 2d triangle defined with 3d coords
   float vertices[] = {
-    0.5f, 0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f, 0.5f, 0.0f, // top left
+    0.5f, 0.5f, 0.0f,     // top right      0
+    0.5f, -0.5f, 0.0f,    // bottom right   1
+    -0.5f, -0.5f, 0.0f,   // bottom left    2
+    -0.5f, 0.5f, 0.0f,    // top left       3
+    0.0f, -0.5f, 0.0f,    // bottom middle  4
+    -0.25f, 0.5f, 0.0f,   // left peak      5
+    0.25f, 0.5f, 0.0f,   // right peak     6
   };
 
   // EBO - element buffer object
   unsigned int indices[] = {
-    0, 1, 3, // first triangle
-    1, 2, 3, // second triangle
+    2, 4, 5, // first triangle
+    1, 4, 6, // second triangle
   };
 
   // Normalized Device Coordinates (NDC)
@@ -267,7 +270,9 @@ int main(int argc, char** argv) {
     glBindVertexArray(VAO);
     // draw that mfing triangle
     // args: primitive type, how many indices to draw, type of indices, starting point of indices
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(unsigned int)));
     // unbind VAO
     glBindVertexArray(0);
 
