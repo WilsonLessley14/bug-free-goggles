@@ -23,3 +23,10 @@ tasks:
     cmds:
       # compile GLAD library
       - gcc -c glad/src/glad.c -Iglad/include -lglfw3 -ldl -o gl.o
+
+  gen_shader:
+    desc: Generate shader string from a .glsl file
+    vars:
+      shader_file: "{{.CLI_ARGS}}"
+    cmds:
+      - ./scripts/glsl_to_string.sh "{{.shader_file}}"
