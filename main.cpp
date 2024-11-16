@@ -131,13 +131,25 @@ int main(int argc, char** argv) {
     -0.5f, 0.5f, 0.0f,    // top left       3
     0.0f, -0.5f, 0.0f,    // bottom middle  4
     -0.25f, 0.5f, 0.0f,   // left peak      5
-    0.25f, 0.5f, 0.0f,   // right peak     6
+    0.25f, 0.5f, 0.0f,    // right peak     6
   };
 
   // EBO - element buffer object
   unsigned int indices[] = {
     2, 4, 5, // first triangle
     1, 4, 6, // second triangle
+  };
+
+  float rightTriangle[] = {
+    0.5f, -0.5f, 0.0f,    // top right      1
+    0.0f, -0.5f, 0.0f,    // bottom middle  4
+    0.25f, 0.5f, 0.0f,    // right peak     6
+  };
+
+  float leftTriangle[] = {
+    -0.5f, -0.5f, 0.0f,   // bottom left    2
+    0.0f, -0.5f, 0.0f,    // bottom middle  4
+    -0.25f, 0.5f, 0.0f,   // left peak      5
   };
 
   // Normalized Device Coordinates (NDC)
@@ -162,23 +174,34 @@ int main(int argc, char** argv) {
     good explanations in this forum
   */
 
-  unsigned int EBO, VBO, VAO;
+  unsigned int EBO, VBOLeft, VBORight, VAOLeft, VAORight;
 
   // generate/link buffer and array objects within OpenGL context
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
+  glGenVertexArrays(1, &VAORight);
+  glGenVertexArrays(1, &VAOLeft);
+  glGenBuffers(1, &VBORight);
+  glGenBuffers(1, &VBOLeft);
+  //glGenBuffers(1, &EBO);
 
   // bind the array object first
-  glBindVertexArray(VAO);
+  glBindVertexArray(VAORight);
   // bind buffer object as the GL_ARRAY_BUFFER
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBORight);
   // glBufferData copies arg 3 into arg 1
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriangle), rightTriangle, GL_STATIC_DRAW);
+
+  // registering vertex attributes
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
 
   // bind element buffer object
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+  glBindVertexArray(VAOLeft);
+  glBindBuffer(GL_ARRAY_BUFFER, VBOLeft);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriangle), leftTriangle, GL_STATIC_DRAW);
+
 
   /*
     GL_STREAM_DRAW: data set once and used by GPU a few times (at most)
@@ -230,7 +253,7 @@ int main(int argc, char** argv) {
 
     param 6:
       value: (void*)0
-      this last param is of type `void`, thus the weird cast hereO?>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      this last param is of type `void`, thus the weird cast here?
       this is the offest of where the position data begins in the buffer.
       this is 0 because our vertex object starts with position data
 
@@ -266,13 +289,14 @@ int main(int argc, char** argv) {
 
     // bind shader program
     glUseProgram(shaderProgram);
-    // bind VAO
-    glBindVertexArray(VAO);
-    // draw that mfing triangle
-    // args: primitive type, how many indices to draw, type of indices, starting point of indices
+    // bind VAORight
+    glBindVertexArray(VAORight);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(unsigned int)));
+    //bind VAOLeft
+    glBindVertexArray(VAOLeft);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     // unbind VAO
     glBindVertexArray(0);
 
@@ -282,8 +306,10 @@ int main(int argc, char** argv) {
   }
 
   // de allocate resources
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
+  glDeleteVertexArrays(1, &VAOLeft);
+  glDeleteVertexArrays(1, &VAORight);
+  glDeleteBuffers(1, &VBOLeft);
+  glDeleteBuffers(1, &VBORight);
   glDeleteProgram(shaderProgram);
 
   // gotta close your shit
