@@ -1,6 +1,8 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
+// these includes are already included in GLManager
+// #include <glad/glad.h>
+// #include <GLFW/glfw3.h>
+// #include <iostream>
+#include "lib/GLManager.h"
 
 // resizing window callback function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -28,28 +30,9 @@ const char *fragmentShaderYellowSource = "#version 330 core\n"
 "}\n";
 
 int main(int argc, char** argv) {
-  //instantiate the glfw window
-  glfwInit();
-
-  // using OpenGL version 3.3
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-  // use coreprofile
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // for macOS
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-  GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-
-  if (window == NULL) {
-    std::cout << "Failed to create window" << std::endl;
-
-    glfwTerminate();
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
+  GLManager manager = GLManager();
+  GLFWwindow * window;
+  window = manager.generateWindow();
 
   // initialize GLAD
   // GLAD manages function pointers for OpenGL. we need to initialize it before calling any OpenGL function
