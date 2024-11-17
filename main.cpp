@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
   while(!glfwWindowShouldClose(window)) {
 
     // --- INPUT --- //
-    processInput(window);
+    manager.processInput();
 
     // --- RENDER --- //
 
@@ -341,7 +341,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
-}
+

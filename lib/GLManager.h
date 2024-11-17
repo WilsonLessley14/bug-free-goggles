@@ -6,6 +6,7 @@
 #define GLMANAGER
 
 class GLManager {
+  GLFWwindow* window;
   public:
   GLManager() {}
   ~GLManager() {}
@@ -32,7 +33,18 @@ class GLManager {
     }
     glfwMakeContextCurrent(window);
 
+    // set the GLmanagers window pointer
+    this->setWindow(window);
     return window;
+  }
+
+  void setWindow(GLFWwindow* window) {
+    this->window = window;
+  }
+
+  void processInput() {
+    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+      glfwSetWindowShouldClose(this->window, true);
   }
 };
 
