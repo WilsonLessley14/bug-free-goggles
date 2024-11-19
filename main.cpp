@@ -8,6 +8,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // processing inputs
 void processInput(GLFWwindow *window);
 
+GLFWwindow* initializeGL(int width = 800, int height = 600);
+
 // shader sources
 const char *vertexShaderSource = "#version 330 core\n"
   "layout (location = 0) in vec3 aPos;\n"
@@ -15,80 +17,40 @@ const char *vertexShaderSource = "#version 330 core\n"
     "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
   "}\0";
 
-const char *fragmentShaderOrangeSource = "#version 330 core\n"
+const char *fragmentShadrOrangeSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main() {\n"
   "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 "}\n";
 
-const char *fragmentShaderYellowSource = "#version 330 core\n"
+const char *fragmentShadrYellowSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main() {\n"
 "FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
 "}\n";
 
 int main(int argc, char** argv) {
-  //instantiate the glfw window
-  glfwInit();
 
-  // using OpenGL version 3.3
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-  // use coreprofile
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // for macOS
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-  GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-
-  if (window == NULL) {
-    std::cout << "Failed to create window" << std::endl;
-
-    glfwTerminate();
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
-
-  // initialize GLAD
-  // GLAD manages function pointers for OpenGL. we need to initialize it before calling any OpenGL function
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "Failed to initialize GLAD" << std::endl;
-
-    glfwTerminate();
-    return -1;
-  }
-
-  // defines the size of the rendering window (viewport)
-  // this can be smaller than the window
-  // first two ints are coords of the bottom left corner of the window
-  // third and fourth are width and height, respectively
-  glViewport(0, 0, 800, 600);
-
-  // we want the viewport to resize with the window
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  // note: callback functions must be registered after the window is created, but before the render loop is initiated
+  GLFWwindow* window = initializeGL();
 
   /* -------- Shader Compilation -------- */
 
   // OpenGL has to compile the shader at run-time from it's own source code
-  unsigned int vertexShader, fragmentShaderOrange, fragmentShaderYellow;
+  unsigned int vertexShader, fragmentShader[2];
 
   // store the shader as an unsigned int create the shader
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  fragmentShaderOrange = glCreateShader(GL_FRAGMENT_SHADER);
-  fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
+  fragmentShader[0] = glCreateShader(GL_FRAGMENT_SHADER);
+  fragmentShader[1] = glCreateShader(GL_FRAGMENT_SHADER);
 
   // attach shader source code to the shader object
   // args; shader object to compile, number of strings being passed as source code, shader source code, NULL
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glShaderSource(fragmentShaderOrange, 1, &fragmentShaderOrangeSource, NULL);
-  glShaderSource(fragmentShaderYellow, 1, &fragmentShaderYellowSource, NULL);
+  glShaderSource(fragmentShader[0], 1, &fragmentShadrOrangeSource, NULL);
+  glShaderSource(fragmentShader[1], 1, &fragmentShadrYellowSource, NULL);
   glCompileShader(vertexShader);
-  glCompileShader(fragmentShaderOrange);
-  glCompileShader(fragmentShaderYellow);
+  glCompileShader(fragmentShader[0]);
+  glCompileShader(fragmentShader[1]);
 
   // this is how we check for compile time errors
   int success;
@@ -102,54 +64,55 @@ int main(int argc, char** argv) {
   }
 
   // -- check for fragment shader orange compilation errors -- //
-  glGetShaderiv(fragmentShaderOrange, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(fragmentShader[0], GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(fragmentShaderOrange, 512, NULL, infoLog);
+    glGetShaderInfoLog(fragmentShader[0], 512, NULL, infoLog);
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   // -- check for fragment shader yellow compilation errors -- //
-  glGetShaderiv(fragmentShaderYellow, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(fragmentShader[1], GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(fragmentShaderYellow, 512, NULL, infoLog);
+    glGetShaderInfoLog(fragmentShader[1], 512, NULL, infoLog);
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   /* -------- Shader Program Creation, Attachment, and Linking -------- */
 
   // define the shader program
-  unsigned int shaderProgramOrange = glCreateProgram();
-  unsigned int shaderProgramYellow = glCreateProgram();
+  unsigned int shaderProgram[2] ;
+  shaderProgram[0] = glCreateProgram();
+  shaderProgram[1] = glCreateProgram();
 
   // attach previously compiled shaders to shader program
-  glAttachShader(shaderProgramOrange, vertexShader);
-  glAttachShader(shaderProgramOrange, fragmentShaderOrange);
+  glAttachShader(shaderProgram[0], vertexShader);
+  glAttachShader(shaderProgram[0], fragmentShader[0]);
 
-  glAttachShader(shaderProgramYellow, vertexShader);
-  glAttachShader(shaderProgramYellow, fragmentShaderYellow);
+  glAttachShader(shaderProgram[1], vertexShader);
+  glAttachShader(shaderProgram[1], fragmentShader[1]);
 
   // link the program (with the shaders attached)
-  glLinkProgram(shaderProgramOrange);
-  glLinkProgram(shaderProgramYellow);
+  glLinkProgram(shaderProgram[0]);
+  glLinkProgram(shaderProgram[1]);
 
   // -- check for linking errors -- //
-  glGetProgramiv(shaderProgramOrange, GL_LINK_STATUS, &success);
+  glGetProgramiv(shaderProgram[0], GL_LINK_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shaderProgramOrange, 512, NULL, infoLog);
+    glGetShaderInfoLog(shaderProgram[0], 512, NULL, infoLog);
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   // -- check for linking errors -- //
-  glGetProgramiv(shaderProgramYellow, GL_LINK_STATUS, &success);
+  glGetProgramiv(shaderProgram[1], GL_LINK_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shaderProgramYellow, 512, NULL, infoLog);
+    glGetShaderInfoLog(shaderProgram[1], 512, NULL, infoLog);
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
   // delete shaders once you are done with them
   glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShaderOrange);
-  glDeleteShader(fragmentShaderYellow);
+  glDeleteShader(fragmentShader[0]);
+  glDeleteShader(fragmentShader[1]);
 
   /* -------- End Shader Program Creation, Attachment, and Linking -------- */
 
@@ -204,19 +167,17 @@ int main(int argc, char** argv) {
     good explanations in this forum
   */
 
-  unsigned int EBO, VBOLeft, VBORight, VAOLeft, VAORight;
+  unsigned int EBO, VBO[2], VAO[2];
 
   // generate/link buffer and array objects within OpenGL context
-  glGenVertexArrays(1, &VAORight);
-  glGenVertexArrays(1, &VAOLeft);
-  glGenBuffers(1, &VBORight);
-  glGenBuffers(1, &VBOLeft);
+  glGenVertexArrays(2, VAO);
+  glGenBuffers(2, VBO);
   //glGenBuffers(1, &EBO);
 
   // bind the array object first
-  glBindVertexArray(VAORight);
+  glBindVertexArray(VAO[0]);
   // bind buffer object as the GL_ARRAY_BUFFER
-  glBindBuffer(GL_ARRAY_BUFFER, VBORight);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
   // glBufferData copies arg 3 into arg 1
   glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriangle), rightTriangle, GL_STATIC_DRAW);
 
@@ -228,8 +189,8 @@ int main(int argc, char** argv) {
   //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glBindVertexArray(VAOLeft);
-  glBindBuffer(GL_ARRAY_BUFFER, VBOLeft);
+  glBindVertexArray(VAO[1]);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriangle), leftTriangle, GL_STATIC_DRAW);
 
 
@@ -321,14 +282,14 @@ int main(int argc, char** argv) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // bind shader program
-    glUseProgram(shaderProgramOrange);
-    // bind VAORight
-    glBindVertexArray(VAORight);
+    glUseProgram(shaderProgram[0]);
+    // bind VAO[0]
+    glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glUseProgram(shaderProgramYellow);
-    //bind VAOLeft
-    glBindVertexArray(VAOLeft);
+    glUseProgram(shaderProgram[1]);
+    //bind VAO[1]
+    glBindVertexArray(VAO[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // unbind VAO
@@ -340,12 +301,10 @@ int main(int argc, char** argv) {
   }
 
   // de allocate resources
-  glDeleteVertexArrays(1, &VAOLeft);
-  glDeleteVertexArrays(1, &VAORight);
-  glDeleteBuffers(1, &VBOLeft);
-  glDeleteBuffers(1, &VBORight);
-  glDeleteProgram(shaderProgramOrange);
-  glDeleteProgram(shaderProgramYellow);
+  glDeleteVertexArrays(2, VAO);
+  glDeleteBuffers(2, VBO);
+  glDeleteProgram(shaderProgram[0]);
+  glDeleteProgram(shaderProgram[1]);
 
   // gotta close your shit
   glfwTerminate();
@@ -362,3 +321,45 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 }
+
+GLFWwindow* initializeGL(int width, int height) {
+  //instantiate the glfw window
+  glfwInit();
+
+  // using OpenGL version 3.3
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+  // use coreprofile
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  // for macOS
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+  GLFWwindow* window = glfwCreateWindow(width, height, "LearnOpenGL", NULL, NULL);
+
+  if (window == NULL) {
+    glfwTerminate();
+    throw ("Failed to create window");
+  }
+  glfwMakeContextCurrent(window);
+
+  // initialize GLAD
+  // GLAD manages function pointers for OpenGL. we need to initialize it before calling any OpenGL function
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    glfwTerminate();
+    throw ("Failed to initialize GLAD");
+  }
+
+  // defines the size of the rendering window (viewport)
+  // this can be smaller than the window
+  // first two ints are coords of the bottom left corner of the window
+  // third and fourth are width and height, respectively
+  glViewport(0, 0, width, height);
+
+  // we want the viewport to resize with the window
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+  return window;
+}
+
