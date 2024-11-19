@@ -90,46 +90,18 @@ int main(int argc, char** argv) {
   glDeleteShader(fragmentShader[1]);
 
   float vertices[] = {
-    0.5f, 0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
     -0.5f, -0.5f, 0.0f,
-    -0.5f, 0.5f, 0.0f,
-    0.0f, -0.5f, 0.0f,
-    -0.25f, 0.5f, 0.0f,
-    0.25f, 0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
   };
 
-  unsigned int indices[] = {
-    2, 4, 5,
-    1, 4, 6,
-  };
-
-  float rightTriangle[] = {
-    0.5f, -0.5f, 0.0f,
-    0.0f, -0.5f, 0.0f,
-    0.25f, 0.5f, 0.0f,
-  };
-
-  float leftTriangle[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.0f, -0.5f, 0.0f,
-    -0.25f, 0.5f, 0.0f,
-  };
-
-  unsigned int EBO, VBO[2], VAO[2];
-  glGenVertexArrays(2, VAO);
-  glGenBuffers(2, VBO);
+  unsigned int VBO[2], VAO[2];
+  glGenVertexArrays(1, VAO);
+  glGenBuffers(1, VBO);
 
   glBindVertexArray(VAO[0]);
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriangle), rightTriangle, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  glBindVertexArray(VAO[1]);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriangle), leftTriangle, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
@@ -147,17 +119,13 @@ int main(int argc, char** argv) {
     glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glUseProgram(shaderProgram[1]);
-    glBindVertexArray(VAO[1]);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
     glBindVertexArray(0);
     glfwPollEvents();
     glfwSwapBuffers(window);
   }
 
-  glDeleteVertexArrays(2, VAO);
-  glDeleteBuffers(2, VBO);
+  glDeleteVertexArrays(1, VAO);
+  glDeleteBuffers(1, VBO);
   glDeleteProgram(shaderProgram[0]);
   glDeleteProgram(shaderProgram[1]);
 
