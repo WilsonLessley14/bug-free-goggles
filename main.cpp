@@ -187,19 +187,16 @@ int main(int argc, char** argv) {
     good explanations in this forum
   */
 
-  unsigned int EBO, VBOLeft, VBORight, VAOLeft, VAORight;
 
-  // generate/link buffer and array objects within OpenGL context
-  glGenVertexArrays(1, &VAORight);
-  glGenVertexArrays(1, &VAOLeft);
-  glGenBuffers(1, &VBORight);
-  glGenBuffers(1, &VBOLeft);
-  //glGenBuffers(1, &EBO);
+  // generate 2 each, VAOs and VBOs
+  glGenVertexArrays(2, &manager.getVAO()[0]);
+  glGenBuffers(2, &manager.getVBO()[0]);
+  //glGenBuffers(1, &manager.getEBO()[0]);
 
   // bind the array object first
-  glBindVertexArray(VAORight);
+  glBindVertexArray(manager.getVAO()[1]);
   // bind buffer object as the GL_ARRAY_BUFFER
-  glBindBuffer(GL_ARRAY_BUFFER, VBORight);
+  glBindBuffer(GL_ARRAY_BUFFER, manager.getVBO()[1]);
   // glBufferData copies arg 3 into arg 1
   glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriangle), rightTriangle, GL_STATIC_DRAW);
 
@@ -208,11 +205,11 @@ int main(int argc, char** argv) {
   glEnableVertexAttribArray(0);
 
   // bind element buffer object
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager.getEBO()[0]);
   //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glBindVertexArray(VAOLeft);
-  glBindBuffer(GL_ARRAY_BUFFER, VBOLeft);
+  glBindVertexArray(manager.getVAO()[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, manager.getVBO()[0]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriangle), leftTriangle, GL_STATIC_DRAW);
 
 
@@ -305,13 +302,13 @@ int main(int argc, char** argv) {
 
     // bind shader program
     glUseProgram(shaderProgramOrange);
-    // bind VAORight
-    glBindVertexArray(VAORight);
+    // bind manager.getVAO()[1]
+    glBindVertexArray(manager.getVAO()[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glUseProgram(shaderProgramYellow);
-    //bind VAOLeft
-    glBindVertexArray(VAOLeft);
+    //bind manager.getVAO()[0]
+    glBindVertexArray(manager.getVAO()[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // unbind VAO
@@ -323,10 +320,8 @@ int main(int argc, char** argv) {
   }
 
   // de allocate resources
-  glDeleteVertexArrays(1, &VAOLeft);
-  glDeleteVertexArrays(1, &VAORight);
-  glDeleteBuffers(1, &VBOLeft);
-  glDeleteBuffers(1, &VBORight);
+  glDeleteVertexArrays(2, &manager.getVAO()[0]);
+  glDeleteBuffers(2, &manager.getVBO()[0]);
   glDeleteProgram(shaderProgramOrange);
   glDeleteProgram(shaderProgramYellow);
 
