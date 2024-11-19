@@ -11,6 +11,10 @@ tasks:
     cmds:
       - clang++ -std=c++11 -stdlib=libc++ -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./example.cpp
 
+  build:test:
+    cmds:
+      - clang++ -std=c++11 -stdlib=libc++ -I./glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./test.cpp ./glad/src/glad.c -o test
+
   run:
     cmds:
      - ./main
@@ -18,6 +22,10 @@ tasks:
   run:example:
     cmds:
      - ./a.out
+
+  run:test:
+    cmds:
+     - ./test
 
   build:glad:
     cmds:
