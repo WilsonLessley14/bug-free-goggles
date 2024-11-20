@@ -7,21 +7,19 @@ void processInput(GLFWwindow *window);
 GLFWwindow* initializeGL(int width = 800, int height = 600);
 
 const char *vertexShaderSource = "#version 330 core\n"
-  "layout (location = 0) in vec3 aPos;\n"
-  "void main() {\n"
-    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-  "}\0";
-
-const char *fragmentShadrOrangeSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
+"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec3 aColor;\n"
+"out vec3 vertexColor;\n"
 "void main() {\n"
-  "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+  "gl_Position = vec4(aPos, 1.0);\n"
+  "vertexColor = aColor;\n"
 "}\n";
 
-const char *fragmentShadrYellowSource = "#version 330 core\n"
+const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"in vec3 vertexColor;\n"
 "void main() {\n"
-"FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+  "FragColor = vec4(vertexColor, 1.0);\n"
 "}\n";
 
 int main(int argc, char** argv) {
@@ -30,14 +28,11 @@ int main(int argc, char** argv) {
   unsigned int vertexShader, fragmentShader[2];
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
   fragmentShader[0] = glCreateShader(GL_FRAGMENT_SHADER);
-  fragmentShader[1] = glCreateShader(GL_FRAGMENT_SHADER);
 
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glShaderSource(fragmentShader[0], 1, &fragmentShadrOrangeSource, NULL);
-  glShaderSource(fragmentShader[1], 1, &fragmentShadrYellowSource, NULL);
+  glShaderSource(fragmentShader[0], 1, &fragmentShaderSource, NULL);
   glCompileShader(vertexShader);
   glCompileShader(fragmentShader[0]);
-  glCompileShader(fragmentShader[1]);
 
   int success;
   char infoLog[512];
@@ -62,16 +57,11 @@ int main(int argc, char** argv) {
 
   unsigned int shaderProgram[2];
   shaderProgram[0] = glCreateProgram();
-  shaderProgram[1] = glCreateProgram();
 
   glAttachShader(shaderProgram[0], vertexShader);
   glAttachShader(shaderProgram[0], fragmentShader[0]);
 
-  glAttachShader(shaderProgram[1], vertexShader);
-  glAttachShader(shaderProgram[1], fragmentShader[1]);
-
   glLinkProgram(shaderProgram[0]);
-  glLinkProgram(shaderProgram[1]);
 
   glGetProgramiv(shaderProgram[0], GL_LINK_STATUS, &success);
   if (!success) {
@@ -79,20 +69,14 @@ int main(int argc, char** argv) {
     std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
   }
 
-  glGetProgramiv(shaderProgram[1], GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(shaderProgram[1], 512, NULL, infoLog);
-    std::cout << "error! fragment shader compilation failed.\nhere is the log: " << infoLog << std::endl;
-  }
-
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader[0]);
-  glDeleteShader(fragmentShader[1]);
 
   float vertices[] = {
-    0.5f, -0.5f, 0.0f,
-    -0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
+    // positions          // colors
+    0.5f, -0.5f,  0.0f,   1.0f,  0.0f,  0.0f, // bottom right
+   -0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f, // bottom left
+    0.0f,  0.5f,  0.0f,   0.0f,  0.0f,  1.0f, // top middle
   };
 
   unsigned int VBO[2], VAO[2];
@@ -103,8 +87,14 @@ int main(int argc, char** argv) {
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  // stride is 6 floats. first 3 are position values, next 3 are color values
+  // start at position 0, move 6 at a time
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
+
+  // start at position 3, move 6 at a time
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -127,7 +117,6 @@ int main(int argc, char** argv) {
   glDeleteVertexArrays(1, VAO);
   glDeleteBuffers(1, VBO);
   glDeleteProgram(shaderProgram[0]);
-  glDeleteProgram(shaderProgram[1]);
 
   glfwTerminate();
   return 0;
