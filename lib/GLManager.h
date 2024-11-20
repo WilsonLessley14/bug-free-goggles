@@ -1,17 +1,20 @@
+#ifndef GLMANAGER_H
+#define GLMANAGER_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
 
-#ifndef GLMANAGER
-#define GLMANAGER
+
+// -- callbacks -- //
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
+}
 
 class GLManager {
   GLFWwindow* window;
-
-  unsigned int VAO[5];
-  unsigned int VBO[5];
-  unsigned int EBO[5];
 
   public:
   GLManager() {}
@@ -21,18 +24,6 @@ class GLManager {
 
   GLFWwindow* getWindow() {
     return this->window;
-  }
-
-  unsigned int* getVAO() {
-    return this->VAO;
-  }
-
-  unsigned int* getVBO() {
-    return this->VBO;
-  }
-
-  unsigned int* getEBO() {
-    return this->EBO;
   }
 
   // -- setting functions -- //
@@ -48,34 +39,34 @@ class GLManager {
       glfwSetWindowShouldClose(this->window, true);
   }
 
-  GLFWwindow* generateWindow() {
-    //instantiate the glfw window
+  GLFWwindow* initializeGL(int width = 800, int height = 600) {
     glfwInit();
-
-    // using OpenGL version 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-    // use coreprofile
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // for macOS
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-
+    GLFWwindow* window = glfwCreateWindow(width, height, "LearnOpenGL", NULL, NULL);
     if (window == NULL) {
-      throw("Failed to create window");
       glfwTerminate();
+      throw ("Failed to create window");
     }
     glfwMakeContextCurrent(window);
 
-    // set the GLmanagers window pointer
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+      glfwTerminate();
+      throw ("Failed to initialize GLAD");
+    }
+
+    glViewport(0, 0, width, height);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
     this->setWindow(window);
+
     return window;
   }
 
-
 };
+
 
 #endif
