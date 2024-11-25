@@ -14,7 +14,7 @@ class Shader {
   int success;
   char infoLog[512];
 
-  const char* readShaderFromFile(const char* shaderPath) {
+  std::string readShaderFromFile(const char* shaderPath) {
     std::string shaderCode;
     std::ifstream shaderFile;
 
@@ -24,33 +24,31 @@ class Shader {
       //open files
       shaderFile.open(shaderPath);
 
-      std::stringstream vertexShaderStream;
+      std::stringstream shaderStream;
 
       // read the file buffer contents into streams
-      vertexShaderStream << shaderFile.rdbuf();
+      shaderStream << shaderFile.rdbuf();
 
       shaderFile.close();
 
-      shaderCode = vertexShaderStream.str();
+      shaderCode = shaderStream.str();
     } catch(std::ifstream::failure e) {
       std::cout << "error reading shader from file" << std::endl;
     }
-    return shaderCode.c_str();
+    return shaderCode;
   }
 
-  unsigned int compileShader(const char* shaderCode) {
-    unsigned int shaderID = glCreateShader(GL_VERTEX_SHADER);
+  void compileShader(const char* shaderCode, unsigned int &shaderID) {
     glShaderSource(shaderID, 1, &shaderCode, NULL);
+    glCompileShader(shaderID);
 
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
     if(!success) {
       glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
-      std::cout << "error shader compilation failed" << infoLog << std::endl;
+      std::cout << "error shader compilation failed. log: " << infoLog << std::endl;
     }
 
     glAttachShader(ID, shaderID);
-    // so we can delete the shader after linking
-    return shaderID;
   }
 
  public:
@@ -58,26 +56,22 @@ class Shader {
   // program id?
   unsigned int ID;
 
-  // -- Method Signatures -- //
-
-  // constructor reads and builds shader
-  Shader(const char* vertexPath, const char* fragmentPath);
-  // use/activate the shader
-  void use();
-  //utility uniform functions
-  void setBool(const std::string &name, bool value) const;
-  void setInt(const std::string &name, int value) const;
-  void setFloat(const std::string &name, float value) const;
-
   // -- Method Definitions -- //
   Shader(const char* vertexPath, const char* fragmentPath) {
-    const char* vertexShaderCode = readShaderFromFile(vertexPath);
-    const char* fragmentShaderCode = readShaderFromFile(fragmentPath);
+    std::string vertexCode = readShaderFromFile(vertexPath);
+    std::string fragmentCode = readShaderFromFile(fragmentPath);
+
+    const char* vertexShaderCode = vertexCode.c_str();
+    const char* fragmentShaderCode = fragmentCode.c_str();
 
     ID = glCreateProgram();
 
-    unsigned int vertexID = compileShader(vertexShaderCode);
-    unsigned int fragmentID = compileShader(fragmentShaderCode);
+    unsigned int vertexID, fragmentID;
+    vertexID = glCreateShader(GL_VERTEX_SHADER);
+    fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
+
+    compileShader(vertexShaderCode, vertexID);
+    compileShader(fragmentShaderCode, fragmentID);
 
     glLinkProgram(ID);
 
@@ -90,6 +84,9 @@ class Shader {
     glDeleteShader(vertexID);
     glDeleteShader(fragmentID);
   }
+  ~Shader() {
+    glDeleteShader(ID);
+  }
 
   void use() {
     glUseProgram(ID);
@@ -98,10 +95,10 @@ class Shader {
   void setBool(const std::string &name, bool value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
   }
-  void setInt(const std::string &name, bool value) const {
+  void setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
   }
-  void setFloat(const std::string &name, bool value) const {
+  void setFloat(const std::string &name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
   }
 
