@@ -5,15 +5,19 @@ tasks:
   build:
     cmds:
       # compile main
-      - clang++ -std=c++11 -stdlib=libc++ -I./glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./glad/src/glad.c -o main
+      - clang++ -std=c++11 -stdlib=libc++ -I./include -I./include/glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./include/glad/src/glad.c -o main
+  run:
+    cmds:
+     - ./main
+
+  start:
+    cmds:
+      - task build
+      - task run
 
   build:example:
     cmds:
       - clang++ -std=c++11 -stdlib=libc++ -lglfw3 -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./example.cpp
-
-  run:
-    cmds:
-     - ./main
 
   run:example:
     cmds:
@@ -24,9 +28,15 @@ tasks:
       # compile GLAD library
       - gcc -c glad/src/glad.c -Iglad/include -lglfw3 -ldl -o gl.o
 
-  gen_shader:
-    desc: Generate shader string from a .glsl file
-    vars:
-      shader_file: "{{.CLI_ARGS}}"
+  build:test:
     cmds:
-      - ./scripts/glsl_to_string.sh "{{.shader_file}}"
+      - clang++ -std=c++11 -stdlib=libc++ -I./include/glad/include -I./include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./test.cpp ./include/glad/src/glad.c -o test
+
+  run:test:
+    cmds:
+      - ./test
+
+  start:test:
+    cmds:
+      - task build:test
+      - task run:test
