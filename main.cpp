@@ -60,27 +60,47 @@ int main(int argc, char** argv) {
 
 
   //textures
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned int texture[2];
+  glGenTextures(2, texture);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture[0]);
+
   int width, height, channelsCount;
   unsigned char *data = stbi_load("textures/container.jpg", &width, &height, &channelsCount, 0);
   if (!data) {
     std::cout << "Failed to load texture" << std::endl;
   }
-
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
 
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, texture[1]);
+  // both textures render w/o freeing data between texture loads
+  // but I think this is best practice. don't want to get in the habit of loading some data where other data already exists
   stbi_image_free(data);
+  data = stbi_load("textures/awesomeface.png", &width, &height, &channelsCount, 0);
+  if (!data) {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glGenerateMipmap(GL_TEXTURE_2D);
+  stbi_image_free(data);
+
   glBindTexture(GL_TEXTURE_2D, 0);
 
+  shader.use();
+  // need to tell the shader program about any shader used above shader 0
+  shader.setInt("texture1", 1);
+
+  //uncomment next line for wireframe mode:
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while(!glfwWindowShouldClose(window)) {
     manager.processInput();
@@ -88,13 +108,13 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //uncomment next line for wireframe mode:
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // might be best practice to activate and bind texture 0 here, but it does not seem technically necessary
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
 
-    shader.use();
-    shader.setFloat("offsetX", 0.5f);
     glBindVertexArray(VAO[0]);
-    glBindTexture(GL_TEXTURE_2D, texture);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
