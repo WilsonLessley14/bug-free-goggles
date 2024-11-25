@@ -72,6 +72,10 @@ int main(int argc, char** argv) {
   glBindTexture(GL_TEXTURE_2D, texture[0]);
 
   int width, height, channelsCount;
+
+  // OGL expects y = 0 to be on the bottom, but most image files treat y = 0 to be the top
+  // this flag flips y axis during image load
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load("textures/container.jpg", &width, &height, &channelsCount, 0);
   if (!data) {
     std::cout << "Failed to load texture" << std::endl;
