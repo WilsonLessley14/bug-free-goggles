@@ -2,13 +2,10 @@
 #include <iostream>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 int main(int argc, char** argv) {
-
-  GLManager manager = GLManager();
-  manager.getVAO()[0] = 8;
-
-  std::cout << manager.getVAO()[0] << std::endl;
-
 
   return 0;
 }
