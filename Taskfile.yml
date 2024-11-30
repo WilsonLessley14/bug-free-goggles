@@ -5,7 +5,7 @@ tasks:
   build:
     cmds:
       # compile main
-      - clang++ -std=c++11 -stdlib=libc++ -I./include -I./include/glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./include/glad/src/glad.c -o main
+      - clang++ -std=c++11 -stdlib=libc++ -I./include -I./include/glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./gl.o -o main
   run:
     cmds:
      - ./main
@@ -26,7 +26,7 @@ tasks:
   build:glad:
     cmds:
       # compile GLAD library
-      - gcc -c glad/src/glad.c -Iglad/include -lglfw3 -ldl -o gl.o
+      - gcc -c include/glad/src/glad.c -I./include/glad/include -lglfw3 -ldl -o gl.o
 
   build:test:
     cmds:
