@@ -18,10 +18,10 @@ int main(int argc, char** argv) {
 
   float vertices[] = {
     // positions          // colors             // texture coords
-    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   1.0f,  1.0f,  // top right
-    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   1.0f,  0.0f,  // bottom right
+    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   3.0f,  3.0f,  // top right
+    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   3.0f,  0.0f,  // bottom right
    -0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f,   0.0f,  0.0f,  // bottom left
-   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  1.0f,  // top left
+   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  3.0f,  // top left
   };
 
   unsigned int indices[] = {
@@ -62,13 +62,13 @@ int main(int argc, char** argv) {
   //textures
   unsigned int texture[2];
   glGenTextures(2, texture);
+  glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture[0]);
 
   int width, height, channelsCount;
@@ -85,6 +85,11 @@ int main(int argc, char** argv) {
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texture[1]);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // both textures render w/o freeing data between texture loads
   // but I think this is best practice. don't want to get in the habit of loading some data where other data already exists
   stbi_image_free(data);
@@ -106,11 +111,19 @@ int main(int argc, char** argv) {
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+  float opacity = 0.2f;
   while(!glfwWindowShouldClose(window)) {
     manager.processInput();
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    if (GLManager::inputs[GLFW_KEY_W])
+      opacity += 0.1f;
+    if (GLManager::inputs[GLFW_KEY_S])
+      opacity -= 0.1f;
+
+    shader.setFloat("opacity", opacity);
 
     // might be best practice to activate and bind texture 0 here, but it does not seem technically necessary
     // glActiveTexture(GL_TEXTURE0);
