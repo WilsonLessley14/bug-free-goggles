@@ -1,6 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include "lib/GLManager.h"
@@ -18,10 +21,10 @@ int main(int argc, char** argv) {
 
   float vertices[] = {
     // positions          // colors             // texture coords
-    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   3.0f,  3.0f,  // top right
-    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   3.0f,  0.0f,  // bottom right
+    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   1.0f,  1.0f,  // top right
+    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   1.0f,  0.0f,  // bottom right
    -0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f,   0.0f,  0.0f,  // bottom left
-   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  3.0f,  // top left
+   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  1.0f,  // top left
   };
 
   unsigned int indices[] = {
@@ -107,7 +110,6 @@ int main(int argc, char** argv) {
   shader.use();
   // need to tell the shader program about any shader used above shader 0
   shader.setInt("texture1", 1);
-
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -134,6 +136,13 @@ int main(int argc, char** argv) {
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.5f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    shader.setMat4("transform", trans);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
