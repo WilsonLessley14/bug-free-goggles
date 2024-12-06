@@ -136,13 +136,24 @@ int main(int argc, char** argv) {
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    float time = glfwGetTime();
 
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.5f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.5f));
+    trans = glm::rotate(trans, time, glm::vec3(0.0f, 0.0f, 1.0f));
 
     shader.setMat4("transform", trans);
 
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    trans = glm::mat4(1.0f);
+
+    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, -0.5f));
+    trans = glm::scale(trans, glm::vec3(sin(time), abs(sin(time)), 0.0f));
+
+    shader.setMat4("transform", trans);
+    
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
