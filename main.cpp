@@ -113,7 +113,14 @@ int main(int argc, char** argv) {
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  float opacity = 0.2f;
+  float opacity = 0.2f, rotationVelocity = 0.0f;
+  glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
+
+  glm::mat4 model, view, projection;
+  model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  projection = glm::perspective(glm::radians(45.0f), manager.width / manager.height, 0.1f, 100.0f);
+  view = glm::translate(view, viewTranslation);
+
   while(!glfwWindowShouldClose(window)) {
     manager.processInput();
 
@@ -121,39 +128,31 @@ int main(int argc, char** argv) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (GLManager::inputs[GLFW_KEY_W])
-      opacity += 0.1f;
-    if (GLManager::inputs[GLFW_KEY_S])
-      opacity -= 0.1f;
+      rotationVelocity = 0.01f;
+    else if (GLManager::inputs[GLFW_KEY_S])
+      rotationVelocity = -0.01f;
+    else 
+      rotationVelocity = 0.0f;
 
     shader.setFloat("opacity", opacity);
 
-    // might be best practice to activate and bind texture 0 here, but it does not seem technically necessary
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture[1]);
 
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3); // DRAW EBO
     
     float time = glfwGetTime();
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.5f));
-    trans = glm::rotate(trans, time, glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::rotate(model, rotationVelocity, glm::vec3(0.0f, 0.0f, 1.0f));
 
-    shader.setMat4("transform", trans);
+    shader.setMat4("model", model);
+    shader.setMat4("projection", projection);
+    shader.setMat4("view", view);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    trans = glm::mat4(1.0f);
-
-    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, -0.5f));
-    trans = glm::scale(trans, glm::vec3(sin(time), abs(sin(time)), 0.0f));
-
-    shader.setMat4("transform", trans);
-    
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
