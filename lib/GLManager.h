@@ -27,15 +27,13 @@ class GLManager {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, true);
 
-    if (key == GLFW_KEY_W && action == GLFW_PRESS)
-      inputs[GLFW_KEY_W] = true;
-    if (key == GLFW_KEY_W && action == GLFW_RELEASE)
-      inputs[GLFW_KEY_W] = false;
+    if (key > inputs.size())
+      return;
 
-    if (key == GLFW_KEY_S && action == GLFW_PRESS)
-      inputs[GLFW_KEY_S] = true;
-    if (key == GLFW_KEY_S && action == GLFW_RELEASE)
-      inputs[GLFW_KEY_S] = false;
+    if (action == GLFW_PRESS)
+      inputs[key] = true;
+    if (action == GLFW_RELEASE)
+      inputs[key] = false;
   }
 
   // -- getting functions -- //
@@ -87,6 +85,6 @@ class GLManager {
 
 };
 
-std::vector<bool> GLManager::inputs(256, false);
+std::vector<bool> GLManager::inputs(512, false);
 
 #endif
