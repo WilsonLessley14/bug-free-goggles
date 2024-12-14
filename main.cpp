@@ -115,6 +115,7 @@ int main(int argc, char** argv) {
 
   float opacity = 0.2f, rotationVelocity = 0.0f;
   glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
+  glm::vec3 viewRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::mat4 model, view, projection;
   model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -128,11 +129,19 @@ int main(int argc, char** argv) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (GLManager::inputs[GLFW_KEY_W])
-      rotationVelocity = 0.01f;
+      viewTranslation.z = 0.01f;
     else if (GLManager::inputs[GLFW_KEY_S])
-      rotationVelocity = -0.01f;
-    else 
+      viewTranslation.z = -0.01f;
+    else if (GLManager::inputs[GLFW_KEY_SPACE])
+      viewTranslation.y = -0.01f;
+    else if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
+      viewTranslation.y = 0.01f;
+    else if (GLManager::inputs[GLFW_KEY_D])
+      rotationVelocity = 0.01f;
+    else { 
+      viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
       rotationVelocity = 0.0f;
+    }
 
     shader.setFloat("opacity", opacity);
 
@@ -147,7 +156,7 @@ int main(int argc, char** argv) {
     
     float time = glfwGetTime();
 
-    model = glm::rotate(model, rotationVelocity, glm::vec3(0.0f, 0.0f, 1.0f));
+    view = glm::translate(view, viewTranslation);
 
     shader.setMat4("model", model);
     shader.setMat4("projection", projection);
