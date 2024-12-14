@@ -15,6 +15,8 @@ class GLManager {
 
   static std::vector<bool> inputs;
 
+  float width, height;
+
   // -- callbacks -- //
 
   static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -77,6 +79,8 @@ class GLManager {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     this->setWindow(window);
+    this->width = (float) width;
+    this->height = (float) height;
 
     return window;
   }
