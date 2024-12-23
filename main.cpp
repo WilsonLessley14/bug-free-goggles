@@ -63,6 +63,19 @@ int main(int argc, char** argv) {
       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
   };
 
+  glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+  };
+
   unsigned int indices[] = {
     0, 1, 3,
     1, 2, 3
@@ -145,9 +158,8 @@ int main(int argc, char** argv) {
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  float opacity = 0.2f, rotationVelocity = 0.1f;
+  float opacity = 0.2f;
   glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
-  glm::vec3 viewRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 view = glm::mat4(1.0f);
@@ -163,19 +175,16 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
+
     if (GLManager::inputs[GLFW_KEY_W])
       viewTranslation.z = 0.01f;
-    else if (GLManager::inputs[GLFW_KEY_S])
+    if (GLManager::inputs[GLFW_KEY_S])
       viewTranslation.z = -0.01f;
-    else if (GLManager::inputs[GLFW_KEY_SPACE])
+    if (GLManager::inputs[GLFW_KEY_SPACE])
       viewTranslation.y = -0.01f;
-    else if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
+    if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
       viewTranslation.y = 0.01f;
-    else if (GLManager::inputs[GLFW_KEY_D])
-      viewRotation.y= 1.0f;
-    else {
-      viewRotation = viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
-    }
 
     shader.setFloat("opacity", opacity);
 
@@ -186,7 +195,16 @@ int main(int argc, char** argv) {
 
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawArrays(GL_TRIANGLES, 0, 36); // DRAW EBO
+
+    for (int i = 0; i < 10; i++) {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.f * i;
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      shader.setMat4("model", model);
+
+      glDrawArrays(GL_TRIANGLES, 0, 36); // DRAW EBO
+    }
 
     float time = glfwGetTime();
 
