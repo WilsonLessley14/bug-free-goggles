@@ -49,7 +49,7 @@ class GLManager {
   }
 
   // -- action functions -- //
-  
+
   void processInput() {
     glfwSetKeyCallback(this->window, keyCallback);
   }
@@ -79,6 +79,8 @@ class GLManager {
     this->setWindow(window);
     this->width = (float) width;
     this->height = (float) height;
+
+    glEnable(GL_DEPTH_TEST);
 
     return window;
   }
