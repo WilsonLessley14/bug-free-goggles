@@ -158,24 +158,24 @@ int main(int argc, char** argv) {
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  float opacity = 0.2f;
+  float opacity = 0.2f, rotationValue = glm::radians(0.0f);
   glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
+  glm::vec3 viewRotation = glm::vec3(1.0f, 0.0f, 0.0f);
 
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(1.0f);
 
   while(!glfwWindowShouldClose(window)) {
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(5.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     projection = glm::perspective(glm::radians(45.0f), manager.width / manager.height, 0.1f, 100.0f);
     view = glm::translate(view, viewTranslation);
+    view = glm::rotate(view, rotationValue, viewRotation);
 
     manager.processInput();
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
+    viewRotation = glm::vec3(0.0f, 1.0f, 0.0f);
+    rotationValue = glm::radians(0.0f);
 
     if (GLManager::inputs[GLFW_KEY_W])
       viewTranslation.z = 0.01f;
@@ -185,6 +185,18 @@ int main(int argc, char** argv) {
       viewTranslation.y = -0.01f;
     if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
       viewTranslation.y = 0.01f;
+    if (GLManager::inputs[GLFW_KEY_D]) {
+      viewRotation.y = 1.0f;
+      rotationValue = glm::radians(1.0f);
+    }
+    if (GLManager::inputs[GLFW_KEY_A]) {
+      viewRotation.y = 1.0f;
+      rotationValue = glm::radians(-1.0f);
+    }
+
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.setFloat("opacity", opacity);
 
@@ -200,7 +212,7 @@ int main(int argc, char** argv) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
       float angle = 20.f * i;
-      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      model = glm::rotate(model, glm::radians(i % 3 == 0 ? (float)glfwGetTime() * 20.f : angle), glm::vec3(1.0f, 0.3f, 0.5f));
       shader.setMat4("model", model);
 
       glDrawArrays(GL_TRIANGLES, 0, 36); // DRAW EBO
@@ -210,7 +222,6 @@ int main(int argc, char** argv) {
 
     view = glm::translate(view, viewTranslation);
 
-    shader.setMat4("model", model);
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
 
