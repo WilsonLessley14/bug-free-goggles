@@ -20,11 +20,47 @@ int main(int argc, char** argv) {
   Shader shader = Shader(vertexShaderPath, fragmentShaderPath);
 
   float vertices[] = {
-    // positions          // colors             // texture coords
-    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   1.0f,  1.0f,  // top right
-    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   1.0f,  0.0f,  // bottom right
-   -0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f,   0.0f,  0.0f,  // bottom left
-   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  1.0f,  // top left
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
   };
 
   unsigned int indices[] = {
@@ -44,18 +80,14 @@ int main(int argc, char** argv) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  // stride is 8 floats. first 3 are position values, next 3 are color values, next 2 are texture coords
-  // start at position 0, move 8 at a time
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+  // stride is 5 floats. first 3 are position values, next 2 are texture coords
+  // start at position 0, read 3, move 5 at a time
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
-  // start at position 3, move 8 at a time
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+  // start at position 3, read 2, move 5 at a time
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
-
-  // start at position 6, move 8 at a time
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -113,20 +145,23 @@ int main(int argc, char** argv) {
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  float opacity = 0.2f, rotationVelocity = 0.0f;
+  float opacity = 0.2f, rotationVelocity = 0.1f;
   glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
   glm::vec3 viewRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
-  glm::mat4 model, view, projection;
-  model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  projection = glm::perspective(glm::radians(45.0f), manager.width / manager.height, 0.1f, 100.0f);
-  view = glm::translate(view, viewTranslation);
+  glm::mat4 model = glm::mat4(1.0f);
+  glm::mat4 view = glm::mat4(1.0f);
+  glm::mat4 projection = glm::mat4(1.0f);
 
   while(!glfwWindowShouldClose(window)) {
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(5.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    projection = glm::perspective(glm::radians(45.0f), manager.width / manager.height, 0.1f, 100.0f);
+    view = glm::translate(view, viewTranslation);
+
     manager.processInput();
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (GLManager::inputs[GLFW_KEY_W])
       viewTranslation.z = 0.01f;
@@ -137,10 +172,9 @@ int main(int argc, char** argv) {
     else if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
       viewTranslation.y = 0.01f;
     else if (GLManager::inputs[GLFW_KEY_D])
-      rotationVelocity = 0.01f;
-    else { 
-      viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
-      rotationVelocity = 0.0f;
+      viewRotation.y= 1.0f;
+    else {
+      viewRotation = viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
     shader.setFloat("opacity", opacity);
@@ -152,8 +186,8 @@ int main(int argc, char** argv) {
 
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //glDrawArrays(GL_TRIANGLES, 0, 3); // DRAW EBO
-    
+    glDrawArrays(GL_TRIANGLES, 0, 36); // DRAW EBO
+
     float time = glfwGetTime();
 
     view = glm::translate(view, viewTranslation);
@@ -162,7 +196,7 @@ int main(int argc, char** argv) {
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
     glfwPollEvents();
