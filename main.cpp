@@ -1,6 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include "lib/GLManager.h"
@@ -17,11 +20,60 @@ int main(int argc, char** argv) {
   Shader shader = Shader(vertexShaderPath, fragmentShaderPath);
 
   float vertices[] = {
-    // positions          // colors             // texture coords
-    0.5f,  0.5f,  0.0f,   1.0f,  0.0f,  0.0f,   3.0f,  3.0f,  // top right
-    0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.0f,   3.0f,  0.0f,  // bottom right
-   -0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  1.0f,   0.0f,  0.0f,  // bottom left
-   -0.5f,  0.5f,  0.0f,   1.0f,  1.0f,  0.0f,   0.0f,  3.0f,  // top left
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+  };
+
+  glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
   };
 
   unsigned int indices[] = {
@@ -41,18 +93,14 @@ int main(int argc, char** argv) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  // stride is 8 floats. first 3 are position values, next 3 are color values, next 2 are texture coords
-  // start at position 0, move 8 at a time
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+  // stride is 5 floats. first 3 are position values, next 2 are texture coords
+  // start at position 0, read 3, move 5 at a time
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
-  // start at position 3, move 8 at a time
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+  // start at position 3, read 2, move 5 at a time
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
-
-  // start at position 6, move 8 at a time
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -107,34 +155,77 @@ int main(int argc, char** argv) {
   shader.use();
   // need to tell the shader program about any shader used above shader 0
   shader.setInt("texture1", 1);
-
   //uncomment next line for wireframe mode:
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  float opacity = 0.2f;
+  float opacity = 0.2f, rotationValue = glm::radians(0.0f);
+  glm::vec3 viewTranslation = glm::vec3(0.0f, 0.0f, -3.0f);
+  glm::vec3 viewRotation = glm::vec3(1.0f, 0.0f, 0.0f);
+
+  glm::mat4 model = glm::mat4(1.0f);
+  glm::mat4 view = glm::mat4(1.0f);
+  glm::mat4 projection = glm::mat4(1.0f);
+
   while(!glfwWindowShouldClose(window)) {
+    projection = glm::perspective(glm::radians(45.0f), manager.width / manager.height, 0.1f, 100.0f);
+    view = glm::translate(view, viewTranslation);
+    view = glm::rotate(view, rotationValue, viewRotation);
+
     manager.processInput();
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    viewTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
+    viewRotation = glm::vec3(0.0f, 1.0f, 0.0f);
+    rotationValue = glm::radians(0.0f);
 
     if (GLManager::inputs[GLFW_KEY_W])
-      opacity += 0.1f;
+      viewTranslation.z = 0.01f;
     if (GLManager::inputs[GLFW_KEY_S])
-      opacity -= 0.1f;
+      viewTranslation.z = -0.01f;
+    if (GLManager::inputs[GLFW_KEY_SPACE])
+      viewTranslation.y = -0.01f;
+    if (GLManager::inputs[GLFW_KEY_LEFT_SHIFT])
+      viewTranslation.y = 0.01f;
+    if (GLManager::inputs[GLFW_KEY_D]) {
+      viewRotation.y = 1.0f;
+      rotationValue = glm::radians(1.0f);
+    }
+    if (GLManager::inputs[GLFW_KEY_A]) {
+      viewRotation.y = 1.0f;
+      rotationValue = glm::radians(-1.0f);
+    }
+
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.setFloat("opacity", opacity);
 
-    // might be best practice to activate and bind texture 0 here, but it does not seem technically necessary
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture[1]);
 
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    for (int i = 0; i < 10; i++) {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.f * i;
+      model = glm::rotate(model, glm::radians(i % 3 == 0 ? (float)glfwGetTime() * 20.f : angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      shader.setMat4("model", model);
+
+      glDrawArrays(GL_TRIANGLES, 0, 36); // DRAW EBO
+    }
+
+    float time = glfwGetTime();
+
+    view = glm::translate(view, viewTranslation);
+
+    shader.setMat4("projection", projection);
+    shader.setMat4("view", view);
+
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
     glfwPollEvents();
