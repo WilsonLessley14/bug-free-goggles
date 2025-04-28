@@ -1,6 +1,8 @@
 #include "matrix.h"
+#include "vector_methods.h"
 #include <iostream>
 #include <vector>
+
 
 Matrix::Matrix(int r, int c): ROWS(r), COLUMNS(c) {
   _matrix = std::vector<std::vector<int> > (c, std::vector<int>(r, 0));
@@ -9,11 +11,7 @@ Matrix::Matrix(int r, int c): ROWS(r), COLUMNS(c) {
 void Matrix::print() {
   std::cout << "ROWS: " << this->ROWS << "\nCOLUMNS: " << this->COLUMNS << std::endl;
   for (std::vector<int> i : this->_matrix) {
-    for( int j : i ) {
-
-      std::cout << " " << j;
-    }
-    std::cout << std::endl;
+    printVector(i);
   }
 }
 

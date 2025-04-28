@@ -1,9 +1,10 @@
 COMPILER=clang++
-SOURCE=main
-TARGET=matrix
+SOURCE=main.cpp
+TARGET=math
+LIB=matrix.cpp vector_methods.cpp
 
 all:
-	$(COMPILER) $(SOURCE).cpp ${TARGET}.cpp -o $(TARGET)
+	$(COMPILER) $(SOURCE) ${LIB} -o $(TARGET)
 
 clean:
 	rm -rf $(TARGET) $(TARGET).dSYM
