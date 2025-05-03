@@ -21,3 +21,11 @@ std::vector<int> addVectors(std::vector<int> left, std::vector<int> right) {
   return sum;
 }
 
+std::vector<int> scaleVector(int scalar, std::vector<int> vec) {
+  std::vector<int> scaled;
+  for (int i = 0; i < vec.size(); i++) {
+    scaled.push_back(scalar * vec[i]);
+  }
+  return scaled;
+}
+

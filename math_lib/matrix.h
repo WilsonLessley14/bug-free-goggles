@@ -9,7 +9,8 @@ class Matrix {
 public:
   Matrix(int r, int c);
   void print();
-  std::vector<int> operator[] (int row);
+  int& operator() (int row, int col);
+  static Matrix* multiplyMatrices(const Matrix *left, const Matrix *right);
 };
 
 #endif

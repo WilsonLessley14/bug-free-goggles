@@ -11,7 +11,7 @@ void printVector(const std::vector<int> vec);
 * @param std::vector<int>left
 * @param std::vector<int>right
 *
-* @return std::vector
+* @return std::vector<int>
 *
 * @desc
 * returns sum of provided vectors
@@ -21,6 +21,9 @@ void printVector(const std::vector<int> vec);
 *
 */
 std::vector<int> addVectors(std::vector<int> left, std::vector<int> right);
+
+std::vector<int> scaleVector(int scalar, std::vector<int> vec);
+
 
 #endif
 
