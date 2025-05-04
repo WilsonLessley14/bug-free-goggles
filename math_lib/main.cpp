@@ -4,37 +4,32 @@
 
 int main () {
 
-  Matrix matrix1(2, 3);
-  Matrix matrix2(3, 2);
+  Matrix matrix1(2, 2), matrix2(2, 2), expected(2, 2);
 
-  matrix1(0, 0) = 3;
-  matrix1(1, 2) = 2;
+  matrix1(0, 0) = 1;
+  matrix1(0, 1) = 1;
+  matrix1(1, 0) = 0;
+  matrix1(1, 1) = 1;
 
-  matrix2(0, 0) = 5;
-  matrix2(2, 1) = 4;
+  matrix2(0, 0) = 0;
+  matrix2(0, 1) = -1;
+  matrix2(1, 0) = 1;
+  matrix2(1, 1) = 0;
+
+  expected(0, 0) = 1;
+  expected(0, 1) = -1;
+  expected(1, 0) = 1;
+  expected(1, 1) = 0;
 
   matrix1.print();
   matrix2.print();
 
   Matrix *matrix3 = Matrix::multiplyMatrices(&matrix1, &matrix2);
 
-  std::cout << "\nproduct of above matrices: " << std::endl;
+  std::cout << "\ncomposition of above matrices: " << std::endl;
   matrix3->print();
 
-
-  std::vector<int> left;
-  std::vector<int> right;
-
-  left.push_back(1);left.push_back(-2);left.push_back(3);
-  right.push_back(4);right.push_back(5);right.push_back(6);
-
-  std::vector<int> sum = addVectors(left, right);
-
-  printVector(sum);
-
-  std::cout << "sum, scaled by 4:" << std::endl;
-
-  printVector(scaleVector(4, sum));
-
+  std::cout << "\nshould equal: " << std::endl;
+  expected.print();
   return 0;
 }
