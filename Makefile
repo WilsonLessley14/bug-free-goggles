@@ -48,19 +48,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /opt/homebrew/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E rm -f
+RM = /opt/homebrew/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/wlessley/Projects/graphics
+CMAKE_SOURCE_DIR = /Users/wlessley/Personal/bug-free-goggles
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/wlessley/Projects/graphics
+CMAKE_BINARY_DIR = /Users/wlessley/Personal/bug-free-goggles
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/wlessley/Projects/graphics
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
-	/usr/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	/usr/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wlessley/Projects/graphics/CMakeFiles /Users/wlessley/Projects/graphics//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wlessley/Personal/bug-free-goggles/CMakeFiles /Users/wlessley/Personal/bug-free-goggles//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wlessley/Projects/graphics/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/wlessley/Personal/bug-free-goggles/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -141,6 +141,19 @@ math: cmake_check_build_system
 math/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/math.dir/build.make CMakeFiles/math.dir/build
 .PHONY : math/fast
+
+#=============================================================================
+# Target rules for targets named sandbox
+
+# Build rule for target.
+sandbox: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 sandbox
+.PHONY : sandbox
+
+# fast build rule for target.
+sandbox/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/build
+.PHONY : sandbox/fast
 
 math_lib/main.o: math_lib/main.cpp.o
 .PHONY : math_lib/main.o
@@ -214,6 +227,54 @@ math_lib/vector_methods.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/math.dir/build.make CMakeFiles/math.dir/math_lib/vector_methods.cpp.s
 .PHONY : math_lib/vector_methods.cpp.s
 
+sandbox_lib/eagerness.o: sandbox_lib/eagerness.cpp.o
+.PHONY : sandbox_lib/eagerness.o
+
+# target to build an object file
+sandbox_lib/eagerness.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/eagerness.cpp.o
+.PHONY : sandbox_lib/eagerness.cpp.o
+
+sandbox_lib/eagerness.i: sandbox_lib/eagerness.cpp.i
+.PHONY : sandbox_lib/eagerness.i
+
+# target to preprocess a source file
+sandbox_lib/eagerness.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/eagerness.cpp.i
+.PHONY : sandbox_lib/eagerness.cpp.i
+
+sandbox_lib/eagerness.s: sandbox_lib/eagerness.cpp.s
+.PHONY : sandbox_lib/eagerness.s
+
+# target to generate assembly for a file
+sandbox_lib/eagerness.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/eagerness.cpp.s
+.PHONY : sandbox_lib/eagerness.cpp.s
+
+sandbox_lib/sandbox.o: sandbox_lib/sandbox.cpp.o
+.PHONY : sandbox_lib/sandbox.o
+
+# target to build an object file
+sandbox_lib/sandbox.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/sandbox.cpp.o
+.PHONY : sandbox_lib/sandbox.cpp.o
+
+sandbox_lib/sandbox.i: sandbox_lib/sandbox.cpp.i
+.PHONY : sandbox_lib/sandbox.i
+
+# target to preprocess a source file
+sandbox_lib/sandbox.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/sandbox.cpp.i
+.PHONY : sandbox_lib/sandbox.cpp.i
+
+sandbox_lib/sandbox.s: sandbox_lib/sandbox.cpp.s
+.PHONY : sandbox_lib/sandbox.s
+
+# target to generate assembly for a file
+sandbox_lib/sandbox.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sandbox.dir/build.make CMakeFiles/sandbox.dir/sandbox_lib/sandbox.cpp.s
+.PHONY : sandbox_lib/sandbox.cpp.s
+
 tutorial.o: tutorial.cxx.o
 .PHONY : tutorial.o
 
@@ -247,6 +308,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... math"
+	@echo "... sandbox"
 	@echo "... tutorial"
 	@echo "... math_lib/main.o"
 	@echo "... math_lib/main.i"
@@ -257,6 +319,12 @@ help:
 	@echo "... math_lib/vector_methods.o"
 	@echo "... math_lib/vector_methods.i"
 	@echo "... math_lib/vector_methods.s"
+	@echo "... sandbox_lib/eagerness.o"
+	@echo "... sandbox_lib/eagerness.i"
+	@echo "... sandbox_lib/eagerness.s"
+	@echo "... sandbox_lib/sandbox.o"
+	@echo "... sandbox_lib/sandbox.i"
+	@echo "... sandbox_lib/sandbox.s"
 	@echo "... tutorial.o"
 	@echo "... tutorial.i"
 	@echo "... tutorial.s"

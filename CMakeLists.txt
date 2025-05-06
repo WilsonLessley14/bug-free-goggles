@@ -12,6 +12,7 @@ configure_file(TutorialConfig.h.in TutorialConfig.h)
 
 add_executable(tutorial tutorial.cxx)
 add_executable(math math_lib/main.cpp math_lib/matrix.cpp math_lib/vector_methods.cpp)
+add_executable(sandbox sandbox_lib/sandbox.cpp sandbox_lib/eagerness.cpp)
 
 # TODO 9: Use target_include_directories to include ${PROJECT_BINARY_DIR}
 target_include_directories(tutorial PUBLIC
