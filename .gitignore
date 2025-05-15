@@ -16,3 +16,4 @@ gl.o
 CMakeFiles/
 CMakeCache.txt
 **/*.cmake
+Makefile

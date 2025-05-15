@@ -2,6 +2,7 @@
 #define VECTOR_METHODS_H
 
 #include <iostream>
+#include <vector>
 
 void printVector(const std::vector<int> vec);
 

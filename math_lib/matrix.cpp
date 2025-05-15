@@ -116,4 +116,19 @@ Matrix* Matrix::multiplyMatrices(const Matrix *left, const Matrix *right) {
   return product;
 }
 
+/*
+*
+* func getDeterminant
+*
+* currently only implements a 2x2 matrix. throws invalid_argument if `this` does not have correct dimensions
+* 
+*/
+int Matrix::getDeterminant() {
+  if (this->ROWS != 2 || this->COLUMNS != 2) {
+    throw std::invalid_argument("`this` matrix is not a 2x2 matrix");
+  }
+
+  // (0, 0 * 1, 1) - (1, 0 * 0, 1)
+  return (this->_matrix[0][0] * this->_matrix[1][1]) - (this->_matrix[1][0] * this->_matrix[0][1]);
+}
 

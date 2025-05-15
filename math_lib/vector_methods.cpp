@@ -1,6 +1,7 @@
 #include "vector_methods.h"
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 void printVector(const std::vector<int> vec) {
   for (int i : vec) {

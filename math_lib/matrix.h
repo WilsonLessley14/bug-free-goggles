@@ -11,6 +11,7 @@ public:
   void print();
   int& operator() (int row, int col);
   static Matrix* multiplyMatrices(const Matrix *left, const Matrix *right);
+  int getDeterminant();
 };
 
 #endif
