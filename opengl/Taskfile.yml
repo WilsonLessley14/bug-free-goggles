@@ -5,7 +5,11 @@ tasks:
   build:
     cmds:
       # compile main
-      - clang++ -std=c++11 -stdlib=libc++ -I./include -I./include/glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./gl.o -o main
+      #
+      # for macos
+      # clang++ -std=c++11 -stdlib=libc++ -I./include -I./include/glad/include -lglfw3 -ldl -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon ./main.cpp ./gl.o -o main
+      - g++ -std=c++11 -I./include -I./include/glad/include ./main.cpp ./gl.o -o main -lglfw -ldl -lGL -lX11 -lpthread -lXrandr
+
   run:
     cmds:
      - ./main
